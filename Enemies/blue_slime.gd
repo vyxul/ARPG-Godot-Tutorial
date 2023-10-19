@@ -3,6 +3,8 @@ extends CharacterBody2D
 @export var speed = 20
 @export var limit = 0.5
 @export var endPoint: Marker2D
+@export var on_hit_dmg: int = 2
+@export var knockbackPower: int = 250
 
 @onready var animations = $AnimationPlayer
 
@@ -36,6 +38,9 @@ func updateAnimation():
 		animationString = "walkRight"
 		
 	animations.play(animationString)
+	
+func get_damage_given() -> int:
+	return on_hit_dmg
 	
 func _physics_process(delta):
 	updateVelocity()

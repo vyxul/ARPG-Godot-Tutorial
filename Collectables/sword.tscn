@@ -1,0 +1,64 @@
+[gd_scene load_steps=9 format=3 uid="uid://b7unu5e8wm67b"]
+
+[ext_resource type="PackedScene" uid="uid://dxh2hklusn0ev" path="res://Collectables/collectable.tscn" id="1_d082y"]
+[ext_resource type="Script" path="res://Collectables/sword.gd" id="2_5qurr"]
+[ext_resource type="Texture2D" uid="uid://dn6sohfbobguk" path="res://Assets/NinjaAdventure/Items/Weapons/BigSword/Sprite.png" id="2_056nu"]
+[ext_resource type="Resource" uid="uid://bkuqwea81iuio" path="res://Inventory/items/sword.tres" id="3_la0ee"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_r8xoq"]
+resource_local_to_scene = true
+size = Vector2(8, 16)
+
+[sub_resource type="Animation" id="Animation_qhcme"]
+resource_name = "spin"
+length = 0.4
+step = 0.4
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 6.28319]
+}
+
+[sub_resource type="Animation" id="Animation_fyxmp"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_rxdbr"]
+_data = {
+"RESET": SubResource("Animation_fyxmp"),
+"spin": SubResource("Animation_qhcme")
+}
+
+[node name="Sword" instance=ExtResource("1_d082y")]
+script = ExtResource("2_5qurr")
+collectableType = "Sword"
+itemRes = ExtResource("3_la0ee")
+
+[node name="Sprite2D" parent="." index="0"]
+texture = ExtResource("2_056nu")
+
+[node name="CollisionShape2D" parent="." index="1"]
+shape = SubResource("RectangleShape2D_r8xoq")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." index="2"]
+libraries = {
+"": SubResource("AnimationLibrary_rxdbr")
+}

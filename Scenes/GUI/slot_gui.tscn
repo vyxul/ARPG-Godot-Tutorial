@@ -1,0 +1,42 @@
+[gd_scene load_steps=4 format=3 uid="uid://dd4pcwmnotfe5"]
+
+[ext_resource type="Texture2D" uid="uid://dppffwvmns4vs" path="res://Assets/NinjaAdventure/HUD/inventorySlot.png" id="1_ll5xi"]
+[ext_resource type="Script" path="res://Scenes/GUI/slot_gui.gd" id="1_p7s7m"]
+[ext_resource type="FontFile" uid="uid://cap6tqpc2sukj" path="res://Assets/NinjaAdventure/HUD/Font/NormalFont.ttf" id="3_bqrpr"]
+
+[node name="Slot" type="Panel"]
+self_modulate = Color(1, 1, 1, 0)
+custom_minimum_size = Vector2(20, 20)
+offset_right = 20.0
+offset_bottom = 20.0
+script = ExtResource("1_p7s7m")
+
+[node name="background" type="Sprite2D" parent="."]
+texture = ExtResource("1_ll5xi")
+centered = false
+vframes = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 0
+offset_right = 20.0
+offset_bottom = 20.0
+
+[node name="Panel" type="Panel" parent="CenterContainer"]
+layout_mode = 2
+
+[node name="item" type="Sprite2D" parent="CenterContainer/Panel"]
+
+[node name="Label" type="Label" parent="CenterContainer/Panel"]
+custom_minimum_size = Vector2(11, 14)
+layout_mode = 0
+offset_left = -1.0
+offset_top = -1.0
+offset_right = 10.0
+offset_bottom = 13.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("3_bqrpr")
+theme_override_font_sizes/font_size = 8
+text = "99"
+horizontal_alignment = 2

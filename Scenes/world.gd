@@ -28,3 +28,11 @@ func _ready():
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	pass
+
+
+func _on_canvas_layer_closed():
+	get_tree().paused = false
+
+
+func _on_canvas_layer_opened():
+	get_tree().paused = true

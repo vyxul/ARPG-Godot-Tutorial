@@ -1,7 +1,8 @@
-[gd_scene load_steps=11 format=3 uid="uid://b34sar8nc7h8h"]
+[gd_scene load_steps=15 format=3 uid="uid://b34sar8nc7h8h"]
 
 [ext_resource type="Texture2D" uid="uid://b25bxdo8f8a0e" path="res://Assets/NinjaAdventure/Actor/Characters/GreenNinja/PlayerSpriteSheet.png" id="1_q7m1q"]
 [ext_resource type="Script" path="res://Player/player.gd" id="1_rs8g5"]
+[ext_resource type="Resource" uid="uid://b2cxipr187ipa" path="res://Inventory/playerInventory.tres" id="2_stw3h"]
 
 [sub_resource type="Animation" id="Animation_omp61"]
 length = 0.001
@@ -103,17 +104,66 @@ _data = {
 size = Vector2(14, 4)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ogtkt"]
-size = Vector2(15.5, 16.5)
+size = Vector2(15.75, 16.5)
+
+[sub_resource type="Animation" id="Animation_jxuyi"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D/ColorRect:color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_hhxhk"]
+resource_name = "hurtBlink"
+length = 0.5
+loop_mode = 1
+step = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D/ColorRect:color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.273812),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 0, 0, 0.501961), Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_eoj5h"]
+_data = {
+"RESET": SubResource("Animation_jxuyi"),
+"hurtBlink": SubResource("Animation_hhxhk")
+}
 
 [node name="Player" type="CharacterBody2D"]
 script = ExtResource("1_rs8g5")
 hit_iframes = 1
+dmg_taken_multiplier = 1
+inventory = ExtResource("2_stw3h")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
+clip_children = 2
 texture = ExtResource("1_q7m1q")
 offset = Vector2(0, -8)
 hframes = 4
 vframes = 7
+
+[node name="ColorRect" type="ColorRect" parent="Sprite2D"]
+offset_left = -19.0
+offset_top = -28.0
+offset_right = 21.0
+offset_bottom = 12.0
+color = Color(1, 1, 1, 0)
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
@@ -125,15 +175,25 @@ position = Vector2(0, -2)
 shape = SubResource("RectangleShape2D_rjjf8")
 
 [node name="Camera2D" type="Camera2D" parent="."]
-position_smoothing_speed = 100.0
+position_smoothing_enabled = true
+position_smoothing_speed = 10.0
 
 [node name="HurtBox" type="Area2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBox"]
-position = Vector2(0, -8)
+position = Vector2(0.125, -8)
 shape = SubResource("RectangleShape2D_ogtkt")
 
 [node name="HurtBoxTimer" type="Timer" parent="HurtBox"]
+one_shot = true
+
+[node name="Effects" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_eoj5h")
+}
+
+[node name="hurtTimer" type="Timer" parent="Effects"]
+wait_time = 0.5
 one_shot = true
 
 [connection signal="area_entered" from="HurtBox" to="." method="_on_hurt_box_area_entered"]
