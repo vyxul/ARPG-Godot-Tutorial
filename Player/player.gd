@@ -14,7 +14,7 @@ signal currentHealthChanged(currentHealth: int)
 @export var maxHealth: int = 12
 @export var hit_iframes: int = 5
 @export var dmg_taken_multiplier: int = 2
-@export var knockbackMultiplier: int = 1
+@export var knockbackTakenMultiplier: int = 1
 @export var inventory: Inventory
 
 @onready var animations = $AnimationPlayer
@@ -22,14 +22,21 @@ signal currentHealthChanged(currentHealth: int)
 @onready var hurtBox = $HurtBox
 @onready var hurtFXTimer = $Effects/hurtTimer
 @onready var hurtBoxTimer = $HurtBox/HurtBoxTimer
+@onready var weapon = $Weapon
 @onready var currentHealth: int = maxHealth
 
 var isHurt: bool = false
+var lastAnimDirection: String = "Down"
+var isAttacking: bool = false
+var direction: String = "Down"
 
 func _ready():
 	hurtBoxTimer.wait_time = hit_iframes
 	effects.play("RESET")
+	weapon.visible = false
+	weapon.disable()
 	hurtFXTimer.wait_time = hit_iframes
+	
 
 func handleInput():
 	var moveDirection = Input.get_vector("left", "right", "up", "down")
@@ -38,8 +45,29 @@ func handleInput():
 		velocity = moveDirection * runSpeed
 	else:
 		velocity = moveDirection * speed
+		
+	# Check for direction
+	if   (velocity.x < 0): direction = "Left"
+	elif (velocity.x > 0): direction = "Right"
+	elif (velocity.y < 0): direction = "Up"
+	elif (velocity.y > 0): direction = "Down"
+	lastAnimDirection = direction
+		
+	if (Input.is_action_pressed("attack")):
+		attack()
+		
+func attack():
+	animations.play("attack" + lastAnimDirection)
+	isAttacking = true
+	weapon.enable()
+	await animations.animation_finished
+	weapon.disable()
+	isAttacking = false
 	
 func updateAnimation():
+	if isAttacking:
+		return
+	
 	# If player stops moving, stop animation
 	if (velocity.length() == 0):
 		# Check if animation player is actually running
@@ -48,14 +76,6 @@ func updateAnimation():
 	
 	# Otherwise, player is moving and needs animation
 	else:
-		# Set default direction
-		var direction = "Down"
-		# Check for if different directions
-		if   (velocity.x < 0): direction = "Left"
-		elif (velocity.x > 0): direction = "Right"
-		elif (velocity.y < 0): direction = "Up"
-			
-		# Set the correct animation based on the player direction
 		animations.play("walk" + direction)
 		
 func handleCollision():
@@ -85,7 +105,7 @@ func hurtByEnemy(area):
 	if !isHurt:
 		var enemy = area.get_parent()
 	#	print_debug("Enemy Hit: %s" % enemy.name)
-		var enemy_dmg_given = enemy.get_damage_given()
+		var enemy_dmg_given = enemy.get_damage()
 	#	print_debug("Enemy Damage Given: %d" % enemy_dmg_given)
 		
 		currentHealth -= round(enemy_dmg_given * dmg_taken_multiplier)
@@ -118,7 +138,7 @@ func _on_hurt_box_area_entered(area):
 	
 	if area.has_method("collect"):
 		area.collect(inventory)
-		print_debug("Collectable type: %s" % area.getCollectableType())
+#		print_debug("Collectable type: %s" % area.getCollectableType())
 
 func _on_hurt_box_timer_timeout():
 #	print_debug("HurtBox Timer timed out")
@@ -127,11 +147,11 @@ func _on_hurt_box_timer_timeout():
 	# doing the solution that uses flag instead
 	pass
 
-func knockback(enemyPosition: Vector2, knockbackPower: int):
+func knockback(enemyPosition: Vector2, enemyknockbackPower: int):
 	# Does the knockback based on the enemy position compared to player position
 #	print_debug("enemyPosition: %s, knockbackPower: %d, position: %s"
 #	 			% [str(enemyPosition), knockbackPower, str(position)])
-	var knockbackDirection = (position - enemyPosition).normalized() * knockbackPower * knockbackMultiplier
+	var knockbackDirection = (position - enemyPosition).normalized() * enemyknockbackPower * knockbackTakenMultiplier
 	velocity = knockbackDirection
 	move_and_slide()
 #	print_debug("enemyPosition: %s, knockbackPower: %d, position: %s" % [str(enemyPosition), knockbackPower, str(position)])
